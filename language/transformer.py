@@ -59,7 +59,7 @@ def rotate_half(x):
     return torch.cat((-x2, x1), dim=-1)
 
 
-@torch.jit.script
+#@torch.jit.script
 def apply_rotary_pos_emb(q, k, cos, sin):
     return (q * cos) + (rotate_half(q) * sin), (k * cos) + (rotate_half(k) * sin)
 
@@ -86,7 +86,8 @@ class Rotary(torch.nn.Module):
             
             self.cos_cached = emb.cos()[None, None, :, :]
             self.sin_cached = emb.sin()[None, None, :, :]
-        
+        #print(f'devices q:{q.device}, k:{k.device}, cos cache {self.cos_cached.device}, sin_cache{self.sin_cached.device}\n\n\n\n\n\n\n\n')
+        #print(f'raw reps q:{q}\n\n\n, k:{k}\n\n\n, cos cache {self.cos_cached}\n\n\n, sin_cache{self.sin_cached}\n\n\n\n\n')
         return apply_rotary_pos_emb(q, k, self.cos_cached, self.sin_cached)
 
 
