@@ -73,8 +73,11 @@ class Rotary(torch.nn.Module):
         self.cos_cached = None
         self.sin_cached = None
 
-    def forward(self, q, k, device="cuda"):
+    def forward(self, q, k, device=None):  # Changed default device parameter
         seq_len = q.size(-2)
+        
+        # Use q's device if no device is specified
+        device = q.device if device is None else device
         
         # Using isinstance does not work, this is necessary for NNSight compatibility
         if (seq_len != self.seq_len_cached) or type(self.cos_cached) != torch.Tensor:

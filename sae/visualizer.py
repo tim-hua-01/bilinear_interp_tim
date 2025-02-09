@@ -109,6 +109,8 @@ class Visualizer:
         for feature in args:
             print(f"feature {feature}")
             input_ids = self.dataset["input_ids"][self.top_activations[:, feature]][:k]
+            input_ids = input_ids.to(self.sae.w_dec.weight.device)
+
             self.color_input_ids(input_ids, feature, **kwargs)
             print()
 
