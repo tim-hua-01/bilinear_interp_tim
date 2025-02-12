@@ -1,7 +1,7 @@
 import torch
 from einops import *
 import plotly.graph_objects as go
-
+from typing import Optional
 from sae import SAE, Point
 from tqdm import tqdm
 
@@ -46,3 +46,14 @@ class Tracer:
             del tensor
             
         return accum
+    
+    def custom_q(self, out_dir: torch.Tensor, project_mat: Optional[torch.Tensor] = None):
+        """Compute the Q tensor for a given output direction and optionally project onto the input matrix."""
+        if project_mat is not None:
+            assert project_mat.shape[0] == out_dir.shape[0], f"Projection matric shape {project_mat.shape} must match output direction shape {out_dir.shape}"
+        model, layer = self.model, self.layer
+        res = torch.einsum("mi,mj,om,...o->...ij", model.w_l[layer], model.w_r[layer], model.w_p[layer], out_dir)
+        res = 0.5 * (res + res.mT)
+        if project_mat is not None:
+            return torch.einsum("il,jk,...ij->...lk", project_mat, project_mat, res)
+        return res
